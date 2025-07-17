@@ -17,8 +17,9 @@ def make_single_prediction(model, input_df):
     """
     input_df: a preprocessed DataFrame (1 row)
     """
-    prediction = model.predict(input_df)
-    return int(prediction[0])
+    prediction = model.predict(input_df)[0]
+    proba = model.predict_proba(input_df)[0][1]  # probability of churn (class 1)
+    return int(prediction), proba
 
 def make_batch_prediction(model, df: pd.DataFrame):
     """
@@ -28,4 +29,5 @@ def make_batch_prediction(model, df: pd.DataFrame):
     :return: List of predictions
     """
     predictions = model.predict(df)
-    return predictions.tolist()
+    probabilities = model.predict_proba(df)[:, 1]  # churn probability for class 1
+    return predictions.tolist(), probabilities.tolist()
