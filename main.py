@@ -50,10 +50,15 @@ async def predict_single(data: UserInput):
             df.drop(columns=['churn'], inplace=True)
 
         # Predict + SHAP
-        prediction = make_single_prediction(trained_model, df)
+        prediction, probability = make_single_prediction(trained_model, df)
         explanation = get_shap_values(trained_model, df)
 
-        return {"prediction": prediction, "shap": explanation}
+        return {
+            "prediction": int(prediction),
+            "probability": float(round(probability, 4)),
+            "shap": {str(k): float(v) for k, v in explanation.items()}
+        }
+
 
     except Exception as e:
         return JSONResponse(
@@ -79,7 +84,7 @@ async def batch_predict(file: UploadFile = File(...)):
             df = df.drop(columns=['churn'])
 
         X = df.copy()
-        predictions = make_batch_prediction(trained_model, X)
+        predictions, probabilities = make_batch_prediction(trained_model, X)
 
         # Compute SHAP values
         import shap
@@ -89,7 +94,18 @@ async def batch_predict(file: UploadFile = File(...)):
         # Convert SHAP values into a list of dictionaries for each row
         shap_dict_list = pd.DataFrame(shap_values, columns=X.columns).to_dict(orient="records")
 
-        return {"predictions": predictions, "shap": shap_dict_list}
+        # return {"predictions": predictions, "shap": shap_dict_list}
+        result_data = [
+            {
+                "prediction": int(pred),
+                "probability": float(round(prob, 4)),
+                "shap": {str(k): float(v) for k, v in shap_dict.items()}
+            }
+            for pred, prob, shap_dict in zip(predictions, probabilities, shap_dict_list)
+        ]
+
+
+        return {"results": result_data}
 
     except Exception as e:
         return JSONResponse(
