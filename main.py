@@ -115,15 +115,4 @@ async def batch_predict(file: UploadFile = File(...)):
 
 
 
-@app.post("/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...), customerid: str = Form(...)):
-    try:
-        contents = await file.read()
-        output_path = f"reports/{customerid}_report.pdf"
-        generate_pdf_report(contents, output_path)
-        return {"message": f"PDF uploaded and saved to {output_path}"}
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"error": str(e), "trace": traceback.format_exc()}
-        )
+
