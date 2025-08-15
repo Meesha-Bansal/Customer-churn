@@ -1,15 +1,6 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
-import xgboost as xgb
+
 import re
 import warnings
 warnings.filterwarnings('ignore')
@@ -217,18 +208,5 @@ class ChurnPredictionModel:
     
     
 
-
-    def encoder(self, df):        
-        # Recalculate types after conversion
-        self.numeric_features = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-        self.categorical_features = df.select_dtypes(include=['object', 'category']).columns.tolist()
-
-        numeric_transformer = StandardScaler()
-        categorical_transformer = OneHotEncoder(drop='first', sparse_output=False, handle_unknown='ignore')
-
-        self.preprocessor = ColumnTransformer(
-            transformers=[
-                ('num', numeric_transformer, self.numeric_features),
-                ('cat', categorical_transformer, self.categorical_features)
-            ])
         
+
